@@ -97,7 +97,6 @@ describe("sync lib", function() {
 			runs(function() {
 				expect(finalResult).toEqual(60);
 			});
-
 		});
 	});
 
@@ -106,14 +105,20 @@ describe("sync lib", function() {
 			var finalResult = 0;
 			var done = false;
 			var timeout = 3000;
-			sync.each([1,2,3,4], function(next, value, k) {
-				setTimeout(function() {
-					finalResult += value;
-					next();
-				}, timeout);
-				timeout -= 500;
-			}, function() { done = true; });
-			
+			sync.each(
+				[1,2,3,4],
+				function(next, value, k) {
+					setTimeout(function() {
+						finalResult += value;
+						next();
+					}, timeout);
+					timeout -= 500;
+				},
+				function() {
+					done = true;
+				}
+			);
+
 			waitsFor(function() { return done; }, "never done", 10000);
 			runs(function() {
 				expect(finalResult).toEqual(10);
@@ -126,15 +131,18 @@ describe("sync lib", function() {
 			var finalResult;
 			var done = false;
 			var timeout = 3000;
-			sync.map([1,2,3,4], function(next, v, k) {
-				setTimeout(function() {
-					next(v * 2);
-				}, timeout);
-				timeout -= 500;
-			}, function(results) {
-				finalResult = results;
-				done = true;
-			});
+			sync.map(
+				[1,2,3,4],
+				function(next, v, k) {
+					setTimeout(function() {
+						next(v * 2);
+					}, timeout);
+					timeout -= 500;
+				}, function(results) {
+					finalResult = results;
+					done = true;
+				}
+			);
 
 			waitsFor(function() { return done; }, "never done", 10000);
 			runs(function() {
@@ -152,19 +160,78 @@ describe("sync lib", function() {
 			var done = false;
 			var timeout = 3000;
 
-			sync.reduce([1,2,3,4], function(next, memo, value) {
-				setTimeout(function() {
-					next(memo + value);
-				}, timeout);
-				timeout -= 500;
-			}, 0, function(result) {
-				finalResult = result;
-				done = true;
-			});
+			sync.reduce(
+				[1,2,3,4],
+				function(next, memo, value) {
+					setTimeout(function() {
+						next(memo + value);
+					}, timeout);
+					timeout -= 500;
+				},
+				0,
+				function(result) {
+					finalResult = result;
+					done = true;
+				}
+			);
 
 			waitsFor(function() { return done; }, "never done", 10000);
 			runs(function() {
 				expect(finalResult).toEqual(10);
+			});
+		});
+	});
+
+	describe("detect function", function() {
+		it("should return the first found item", function() {
+			var finalResult;
+			var done = false;
+			var timeout = 3000;
+
+			sync.detect(
+				[1,2,3,4],
+				function(next, value) {
+					setTimeout(function() {
+						next(value === 3);
+					}, timeout);
+					timeout -= 500;
+				},
+				function(result) {
+					finalResult = result;
+					done = true;
+				}
+			);
+
+			waitsFor(function() { return done; }, "never done", 10000);
+
+			runs(function() {
+				expect(finalResult).toEqual(3);
+			});
+		});
+
+		it("should return undefined if item is not found", function() {
+			var finalResult;
+			var done = false;
+			var timeout = 3000;
+
+			sync.detect(
+				[1,2,3,4],
+				function(next, value) {
+					setTimeout(function() {
+						next(value === 5);
+					}, timeout);
+					timeout -= 500;
+				},
+				function(result) {
+					finalResult = result;
+					done = true;
+				}
+			);
+
+			waitsFor(function() { return done; }, "never done", 10000);
+
+			runs(function() {
+				expect(finalResult).toEqual(undefined);
 			});
 		});
 	});

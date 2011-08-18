@@ -13,9 +13,11 @@ var sync = {
 		};
 		next();
 	},
+
 	series: function(callbacks, done) {
 		this.pipe(callbacks, done);
 	},
+
 	each: function(arr, iterator, done) {
 		var items = [];
 		var next = function() {
@@ -34,6 +36,7 @@ var sync = {
 		}
 		next();
 	},
+
 	map: function(arr, iterator, done) {
 		var items = [];
 		var results = [];
@@ -66,6 +69,7 @@ var sync = {
 
 		start();
 	},
+
 	reduce: function(arr, iterator, initial, done) {
 		var items = [];
 
@@ -87,6 +91,32 @@ var sync = {
 		}
 
 		next(initial);
+	},
+
+	detect: function(arr, iterator, done) {
+		var items = [];
+		var currentItem;
+
+		var next = function(result) {
+			if (result) {
+				done && done(arr[currentItem]);
+			}
+			var item = items.shift();
+			if (item) {
+				currentItem = item[1];
+				item.unshift(next);
+				iterator.apply(null, item);
+			} else {
+				done && done(void 0);
+			}
+		};
+
+		for(var i in arr) {
+			if (arr.hasOwnProperty(i)) {
+				items.push([arr[i], i]);
+			}
+		}
+		next(false);
 	}
 };
 if (typeof window !== "undefined") { window.sync = sync; }
