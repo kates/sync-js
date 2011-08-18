@@ -145,4 +145,27 @@ describe("sync lib", function() {
 			});
 		});
 	});
+
+	describe("reduce function", function() {
+		it("should reduce an array to single value", function() {
+			var finalResult;
+			var done = false;
+			var timeout = 3000;
+
+			sync.reduce([1,2,3,4], function(next, memo, value) {
+				setTimeout(function() {
+					next(memo + value);
+				}, timeout);
+				timeout -= 500;
+			}, 0, function(result) {
+				finalResult = result;
+				done = true;
+			});
+
+			waitsFor(function() { return done; }, "never done", 10000);
+			runs(function() {
+				expect(finalResult).toEqual(10);
+			});
+		});
+	});
 });

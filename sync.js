@@ -65,6 +65,28 @@ var sync = {
 		}
 
 		start();
+	},
+	reduce: function(arr, iterator, initial, done) {
+		var items = [];
+
+		var next = function(result) {
+			var item = items.shift();
+			if (item) {
+				item.unshift(result);
+				item.unshift(next);
+				iterator.apply(null, item);
+			} else {
+				done && done(result);
+			}
+		};
+
+		for(var i in arr) {
+			if (arr.hasOwnProperty(i)) {
+				items.push([arr[i], i]);
+			}
+		}
+
+		next(initial);
 	}
 };
 if (typeof window !== "undefined") { window.sync = sync; }
