@@ -1,4 +1,4 @@
-
+// TODO: abstract duplicate codes.
 var sync = {
 	pipe: function(callbacks, done) {
 		var next = function(result) {
@@ -29,7 +29,7 @@ var sync = {
 				done && done();
 			}
 		};
-		for(var i in arr) {
+		for (var i in arr) {
 			if (arr.hasOwnProperty(i)) {
 				items.push([arr[i], i]);
 			}
@@ -61,7 +61,7 @@ var sync = {
 			}
 		};
 
-		for(var i in arr) {
+		for (var i in arr) {
 			if (arr.hasOwnProperty(i)) {
 				items.push([arr[i], i]);
 			}
@@ -84,7 +84,7 @@ var sync = {
 			}
 		};
 
-		for(var i in arr) {
+		for (var i in arr) {
 			if (arr.hasOwnProperty(i)) {
 				items.push([arr[i], i]);
 			}
@@ -107,7 +107,7 @@ var sync = {
 				item.unshift(next);
 				iterator.apply(null, item);
 			} else {
-				done && done(void 0);
+				done && done(undefined);
 			}
 		};
 
@@ -117,6 +117,17 @@ var sync = {
 			}
 		}
 		next(false);
+	},
+
+	while: function(test, body, done) {
+		var next = function() {
+			if (test()) {
+				body.apply(null, [next]);
+			} else {
+				done && done(undefined);
+			}
+		}
+		next();
 	}
 };
 if (typeof window !== "undefined") { window.sync = sync; }

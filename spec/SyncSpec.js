@@ -235,4 +235,34 @@ describe("sync lib", function() {
 			});
 		});
 	});
+
+	describe("while function", function() {
+		it("should loop until test returns false", function() {
+			var sum = 0;
+			var inc = 100;
+			var done = false;
+			var timeout = 3000;
+			var i = 0;
+
+			sync.while(
+				function(){ return i++ < 5 },
+				function(next) {
+					sum += inc;
+					setTimeout(function(){
+						next();
+					}, timeout);
+					timeout -= 500;
+				},
+				function(){
+					done = true;
+				}
+			);
+
+			waitsFor(function() { return done; }, "never done", 10000);
+
+			runs(function() {
+				expect(sum).toEqual(500);
+			});
+		});
+	});
 });
