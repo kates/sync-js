@@ -29,11 +29,9 @@ var sync = {
 				done && done();
 			}
 		};
-		for (var i in arr) {
-			if (arr.hasOwnProperty(i)) {
-				items.push([arr[i], i]);
-			}
-		}
+
+		this.normalize(arr);
+
 		next();
 	},
 
@@ -61,11 +59,7 @@ var sync = {
 			}
 		};
 
-		for (var i in arr) {
-			if (arr.hasOwnProperty(i)) {
-				items.push([arr[i], i]);
-			}
-		}
+		this.normalize(arr);
 
 		start();
 	},
@@ -84,11 +78,7 @@ var sync = {
 			}
 		};
 
-		for (var i in arr) {
-			if (arr.hasOwnProperty(i)) {
-				items.push([arr[i], i]);
-			}
-		}
+		this.normalize(arr);
 
 		next(initial);
 	},
@@ -111,11 +101,8 @@ var sync = {
 			}
 		};
 
-		for(var i in arr) {
-			if (arr.hasOwnProperty(i)) {
-				items.push([arr[i], i]);
-			}
-		}
+		items = this.normalize(arr);
+
 		next(false);
 	},
 
@@ -128,6 +115,24 @@ var sync = {
 			}
 		}
 		next();
+	},
+
+	normalize: function(src) {
+		var items = [];
+
+		if (src instanceof Array) {
+			for (var i = 0; i < src.length; i++) {
+				items.push([src[i], i]);
+			}
+		} else {
+			for(var i in src) {
+				if (src.hasOwnProperty(i)) {
+					dest.push([src[i], i]);
+				}
+			}
+		}
+
+		return items;
 	}
 };
 if (typeof window !== "undefined") { window.sync = sync; }

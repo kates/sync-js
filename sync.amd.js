@@ -23,6 +23,7 @@ define(function() {
 			var items = [];
 			var next = function() {
 				var item = items.shift();
+
 				if (item) {
 					item.unshift(next);
 					iterator.apply(null, item);
@@ -30,11 +31,9 @@ define(function() {
 					done && done();
 				}
 			};
-			for (var i in arr) {
-				if (arr.hasOwnProperty(i)) {
-					items.push([arr[i], i]);
-				}
-			}
+
+			items = this.normalize(arr);
+
 			next();
 		},
 
@@ -62,11 +61,7 @@ define(function() {
 				}
 			};
 
-			for (var i in arr) {
-				if (arr.hasOwnProperty(i)) {
-					items.push([arr[i], i]);
-				}
-			}
+			items = this.normalize(arr);
 
 			start();
 		},
@@ -84,12 +79,8 @@ define(function() {
 					done && done(result);
 				}
 			};
-
-			for (var i in arr) {
-				if (arr.hasOwnProperty(i)) {
-					items.push([arr[i], i]);
-				}
-			}
+			
+			items = this.normalize(arr);
 
 			next(initial);
 		},
@@ -112,11 +103,8 @@ define(function() {
 				}
 			};
 
-			for(var i in arr) {
-				if (arr.hasOwnProperty(i)) {
-					items.push([arr[i], i]);
-				}
-			}
+			items = this.normalize(arr);
+
 			next(false);
 		},
 
@@ -129,6 +117,24 @@ define(function() {
 				}
 			}
 			next();
+		},
+
+		normalize: function(src) {
+			var items = [];
+
+			if (src instanceof Array) {
+				for (var i = 0; i < src.length; i++) {
+					items.push([src[i], i]);
+				}
+			} else {
+				for(var i in src) {
+					if (src.hasOwnProperty(i)) {
+						dest.push([src[i], i]);
+					}
+				}
+			}
+
+			return items;
 		}
 	};
 
